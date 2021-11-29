@@ -66,6 +66,7 @@ int main() {
 
     hidecursor();
 
+
     while (1) {
         while (!kbhit()) {
             rail(0);
