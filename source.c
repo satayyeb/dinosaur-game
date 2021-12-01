@@ -85,6 +85,7 @@ int main() {
 
     while (1) {
         rail(0);
+
         if (!kbhit()) {
             continue;
         }
@@ -94,6 +95,8 @@ int main() {
           //  jump();
             rail(1);
         } else if (ch == 'x') {
+            system("cls");
+            printf("\n\n        It worked! I have no idea why...  :P    \n\n\n\n");
             return (0);
         }
     }
