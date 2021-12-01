@@ -5,12 +5,14 @@
 #include <windows.h>
 
 #define DURATION 90
+#define STAR_POSITION_X 7
 
 clock_t t = 0;
 clock_t last = 0;
 int p = 49;
 int flag = 0;
-
+char c;
+int on_air = 0;
 
 void gotoxy(int x, int y) {
     COORD coord;
@@ -29,19 +31,21 @@ void hidecursor() {
 
 void rail(int jump) {
     if (jump == 1) {
-        gotoxy(3, 7);
+        gotoxy(STAR_POSITION_X, 7);
         printf("%c", ' ');
-        gotoxy(3, 6);
+        gotoxy(STAR_POSITION_X, 6);
         printf("%c", '*');
         t = clock();
         flag = 1;
         jump = 0;
+        on_air = 1;
     }
-    if (flag == 1 && difftime(clock(), t) > DURATION * 5) {
-        gotoxy(3, 7);
+    if (flag == 1 && difftime(clock(), t) > DURATION * STAR_POSITION_X) {
+        gotoxy(STAR_POSITION_X, 7);
         printf("%c", '*');
-        gotoxy(3, 6);
+        gotoxy(STAR_POSITION_X, 6);
         printf("%c", ' ');
+        on_air = 0;
         flag = 0;
     }
     if (difftime(clock(), last) > DURATION) {
@@ -52,14 +56,25 @@ void rail(int jump) {
         }
         printf("%c", '|');
         printf("%c", '=');
+        gotoxy(p, 7);
+        printf("%c", '|');
+        printf("%c", ' ');
         p--;
     }
+    if (
+        (p == STAR_POSITION_X || p == STAR_POSITION_X - 1) && !on_air) {
+        printf("You lost :(");
+        while (1);
+    }
+
 }
 
 
 int main() {
     int i;
     char ch;
+    gotoxy(STAR_POSITION_X, 7);
+    printf("%c", '*');
     gotoxy(0, 8);
     for (i = 0; i < 50; i++) {
         printf("%c", '=');
@@ -76,7 +91,7 @@ int main() {
         ch = getch();
         if (ch == ' ') {
             rail(1);
-        } else if (ch == 'x'){
+        } else if (ch == 'x') {
             return (0);
         }
     }
