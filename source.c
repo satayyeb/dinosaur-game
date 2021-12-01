@@ -4,6 +4,8 @@
 #include <time.h>
 #include <windows.h>
 
+#define DURATION 90
+
 clock_t t = 0;
 clock_t last = 0;
 int p = 49;
@@ -35,14 +37,14 @@ void rail(int jump) {
         flag = 1;
         jump = 0;
     }
-    if (flag == 1 && difftime(clock(), t) > 60 * 5) {
+    if (flag == 1 && difftime(clock(), t) > DURATION * 5) {
         gotoxy(3, 7);
         printf("%c", '*');
         gotoxy(3, 6);
         printf("%c", ' ');
         flag = 0;
     }
-    if (difftime(clock(), last) > 60) {
+    if (difftime(clock(), last) > DURATION) {
         last = clock();
         gotoxy(p, 8);
         if (p == 0) {
