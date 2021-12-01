@@ -84,12 +84,14 @@ int main() {
 
 
     while (1) {
-        while (!kbhit()) {
-            rail(0);
+        rail(0);
+        if (!kbhit()) {
+            continue;
         }
 
         ch = getch();
         if (ch == ' ') {
+          //  jump();
             rail(1);
         } else if (ch == 'x') {
             return (0);
