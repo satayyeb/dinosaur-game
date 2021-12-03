@@ -7,13 +7,15 @@
 
 
 
-#define DURATION 90
-#define DINOSAUR_X_POS 3
+#define DURATION 50
+#define DINOSAUR_X_POS 7
 #define FULL    '\xDB'
 #define UP  '\xDF'
 #define DOWN    '\xDC'
 #define EARTH 24
 #define LENGTH 80
+
+int last_cactus_pos = LENGTH;
 
 
 
@@ -160,18 +162,41 @@ void print_dinosaur() {
     }
 }
 
-void jump() {
-    print_dinosaur();
+int clear_cactus() {
+    for (int i = 0; i < 5; i++) {
+        gotoxy(last_cactus_pos, EARTH - 5 + i);
+        for (int j = 0; j < 5; j++) {
+            printf("%c", ' ');
+        }
+    }
 }
-void jump_more() {
-    print_dinosaur();
+
+int print_cactus() {
+    for (int i = 0; i < 5; i++) {
+        gotoxy(last_cactus_pos, EARTH - 5 + i);
+        for (int j = 0; j < 5; j++) {
+            printf("%c", cactus[i][j]);
+        }
+    }
 }
-void land() {
-    print_dinosaur();
+
+int cactus_rail() {
+    if (difftime(clock(), last) > DURATION) {
+        last = clock();
+
+        gotoxy(last_cactus_pos, EARTH - 5);
+        clear_cactus();
+
+        last_cactus_pos--;
+        if (last_cactus_pos == 0) {
+            last_cactus_pos = LENGTH;
+        }
+
+        print_cactus();
+    }
 }
-void full_land() {
-    print_dinosaur();
-}
+
+
 
 int main() {
     char ch;
@@ -185,20 +210,21 @@ int main() {
 
 
     while (1) {
-        if (status == 1 && difftime(clock(), t) > 50) {
+        cactus_rail();
+        if (status == 1 && difftime(clock(), t) > 100) {
             t = clock();
             status = 2;
-            jump_more();
+            print_dinosaur();
         }
-        if (status == 2 && difftime(clock(), t) > 600) {
+        if (status == 2 && difftime(clock(), t) > 1500) {
             t = clock();
             status = 3;
-            land();
+            print_dinosaur();
         }
-        if (status == 3 && difftime(clock(), t) > 50) {
+        if (status == 3 && difftime(clock(), t) > 100) {
             t = clock();
             status = 0;
-            full_land();
+            print_dinosaur();
         }
 
         if (status != 0 || !kbhit()) {
@@ -209,7 +235,7 @@ int main() {
         if (ch == ' ') {
             t = clock();
             status = 1;
-            jump();
+            print_dinosaur();
         }
 
         else if (ch == 'x') {
