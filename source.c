@@ -66,44 +66,6 @@ void hidecursor() {
     SetConsoleCursorInfo(consoleHandle, &info);
 }
 
-void rail(int jump) {
-    if (jump == 1) {
-        gotoxy(DINOSAUR_X_POS, 7);
-        printf("%c", ' ');
-        gotoxy(DINOSAUR_X_POS, 6);
-        printf("%c", '*');
-        t = clock();
-        flag = 1;
-        jump = 0;
-        on_air = 1;
-    }
-    if (flag == 1 && difftime(clock(), t) > DURATION * DINOSAUR_X_POS) {
-        gotoxy(DINOSAUR_X_POS, 7);
-        printf("%c", '*');
-        gotoxy(DINOSAUR_X_POS, 6);
-        printf("%c", ' ');
-        on_air = 0;
-        flag = 0;
-    }
-    if (difftime(clock(), last) > DURATION) {
-        last = clock();
-        gotoxy(p, 8);
-        if (p == 0) {
-            p = 49;
-        }
-        printf("%c", '|');
-        printf("%c", '=');
-        gotoxy(p, 7);
-        printf("%c", '|');
-        printf("%c", ' ');
-        p--;
-    }
-    if ((p == DINOSAUR_X_POS || p == DINOSAUR_X_POS - 1) && !on_air) {
-        printf("You lost :(");
-        while (1);
-    }
-
-}
 void print_dinosaur() {
 
     //go to the last position
