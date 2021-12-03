@@ -4,8 +4,42 @@
 #include <time.h>
 #include <windows.h>
 
+
+
+
 #define DURATION 90
-#define STAR_POSITION_X 7
+#define DINOSAUR_X_POS 7
+#define FULL    '\xDB'
+#define UP  '\xDF'
+#define DOWN    '\xDC'
+#define EARTH 24
+#define LENGTH 80
+
+
+
+
+char mini_cactus[3][3] = {
+    {FULL, ' ', DOWN},
+    {FULL, ' ', FULL},
+    {FULL, UP, UP} };
+
+char cactus[5][5] = {
+    {' ', ' ', DOWN, ' ', ' '},
+    {FULL, ' ', FULL, ' ', FULL},
+    {FULL, ' ', FULL, ' ', FULL},
+    {UP, UP, FULL, UP, UP},
+    {' ', ' ', FULL, ' ', ' '} };
+
+char dinosaur[7][16] = {
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', DOWN, FULL, UP, FULL, FULL, FULL, FULL, DOWN},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', FULL, FULL, FULL, FULL, DOWN, DOWN, DOWN, ' '},
+    {FULL, ' ', ' ', ' ', ' ', ' ', DOWN, FULL, FULL, FULL, FULL, ' ', ' ', ' ', ' ', ' '},
+    {FULL, FULL, DOWN, ' ', DOWN, FULL, FULL, FULL, FULL, FULL, FULL, UP, UP, FULL, ' ', ' '},
+    {UP, FULL, FULL, FULL, FULL, FULL, FULL, FULL, FULL, FULL, UP, ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', UP, FULL, FULL, FULL, FULL, FULL, UP, ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', FULL, DOWN, ' ', FULL, DOWN, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+};
+
 
 clock_t t = 0;
 clock_t last = 0;
@@ -31,19 +65,19 @@ void hidecursor() {
 
 void rail(int jump) {
     if (jump == 1) {
-        gotoxy(STAR_POSITION_X, 7);
+        gotoxy(DINOSAUR_X_POS, 7);
         printf("%c", ' ');
-        gotoxy(STAR_POSITION_X, 6);
+        gotoxy(DINOSAUR_X_POS, 6);
         printf("%c", '*');
         t = clock();
         flag = 1;
         jump = 0;
         on_air = 1;
     }
-    if (flag == 1 && difftime(clock(), t) > DURATION * STAR_POSITION_X) {
-        gotoxy(STAR_POSITION_X, 7);
+    if (flag == 1 && difftime(clock(), t) > DURATION * DINOSAUR_X_POS) {
+        gotoxy(DINOSAUR_X_POS, 7);
         printf("%c", '*');
-        gotoxy(STAR_POSITION_X, 6);
+        gotoxy(DINOSAUR_X_POS, 6);
         printf("%c", ' ');
         on_air = 0;
         flag = 0;
@@ -61,8 +95,7 @@ void rail(int jump) {
         printf("%c", ' ');
         p--;
     }
-    if (
-        (p == STAR_POSITION_X || p == STAR_POSITION_X - 1) && !on_air) {
+    if ((p == DINOSAUR_X_POS || p == DINOSAUR_X_POS - 1) && !on_air) {
         printf("You lost :(");
         while (1);
     }
@@ -73,10 +106,10 @@ void rail(int jump) {
 int main() {
     int i;
     char ch;
-    gotoxy(STAR_POSITION_X, 7);
+    gotoxy(DINOSAUR_X_POS, EARTH - 1);
     printf("%c", '*');
-    gotoxy(0, 8);
-    for (i = 0; i < 50; i++) {
+    gotoxy(0, EARTH);
+    for (i = 0; i < LENGTH; i++) {
         printf("%c", '=');
     }
 
@@ -92,7 +125,7 @@ int main() {
 
         ch = getch();
         if (ch == ' ') {
-          //  jump();
+            //  jump();
             rail(1);
         } else if (ch == 'x') {
             system("cls");
