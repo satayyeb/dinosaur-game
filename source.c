@@ -8,7 +8,7 @@
 
 
 #define DURATION 90
-#define DINOSAUR_X_POS 7
+#define DINOSAUR_X_POS 3
 #define FULL    '\xDB'
 #define UP  '\xDF'
 #define DOWN    '\xDC'
@@ -47,6 +47,7 @@ int p = 49;
 int flag = 0;
 char c;
 int on_air = 0;
+int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing / it is better to have a struct for this :/
 
 void gotoxy(int x, int y) {
     COORD coord;
@@ -101,15 +102,82 @@ void rail(int jump) {
     }
 
 }
+void print_dinosaur() {
 
+    //go to the last position
+    switch (status) {
+    case 0:
+        gotoxy(0, EARTH - 10);
+        break;
+    case 1:
+        gotoxy(0, EARTH - 7);
+        break;
+    case 2:
+        gotoxy(0, EARTH - 10);
+        break;
+    case 3:
+        gotoxy(0, EARTH - 13);
+        break;
+    default:
+        break;
+    }
+
+    //erase the previous dinosaur
+    for (int i = 0; i < 7; i++) {
+        for (int j = 0; j < 16 + DINOSAUR_X_POS; j++) {
+            printf("%c", ' ');
+        }
+        printf("\n");
+    }
+
+    //go to the next position
+    switch (status) {
+    case 0:
+        gotoxy(0, EARTH - 7);
+        break;
+    case 1:
+        gotoxy(0, EARTH - 10);
+        break;
+    case 2:
+        gotoxy(0, EARTH - 13);
+        break;
+    case 3:
+        gotoxy(0, EARTH - 10);
+        break;
+    default:
+        break;
+    }
+
+    //print the dinosaur
+    for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < DINOSAUR_X_POS; i++) {
+            printf(" ");
+        }
+        for (int j = 0; j < 16; j++) {
+            printf("%c", dinosaur[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void jump() {
+    print_dinosaur();
+}
+void jump_more() {
+    print_dinosaur();
+}
+void land() {
+    print_dinosaur();
+}
+void full_land() {
+    print_dinosaur();
+}
 
 int main() {
-    int i;
     char ch;
-    gotoxy(DINOSAUR_X_POS, EARTH - 1);
-    printf("%c", '*');
+    print_dinosaur();
     gotoxy(0, EARTH);
-    for (i = 0; i < LENGTH; i++) {
+    for (int i = 0; i < LENGTH; i++) {
         printf("%c", '=');
     }
 
@@ -117,17 +185,34 @@ int main() {
 
 
     while (1) {
-        rail(0);
+        if (status == 1 && difftime(clock(), t) > 50) {
+            t = clock();
+            status = 2;
+            jump_more();
+        }
+        if (status == 2 && difftime(clock(), t) > 600) {
+            t = clock();
+            status = 3;
+            land();
+        }
+        if (status == 3 && difftime(clock(), t) > 50) {
+            t = clock();
+            status = 0;
+            full_land();
+        }
 
-        if (!kbhit()) {
+        if (status != 0 || !kbhit()) {
             continue;
         }
 
         ch = getch();
         if (ch == ' ') {
-            //  jump();
-            rail(1);
-        } else if (ch == 'x') {
+            t = clock();
+            status = 1;
+            jump();
+        }
+
+        else if (ch == 'x') {
             system("cls");
             printf("\n\n        It worked! I have no idea why...  :P    \n\n\n\n");
             return (0);
