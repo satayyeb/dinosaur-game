@@ -205,7 +205,12 @@ int main() {
     gotoxy(6, 6);
     printf("    x to exit");
     ch = getch();
-    while (ch != ' ') {}
+    while (ch != ' ' && ch != 'x' && ch != 'X') {
+        ch = getch();
+    }
+    if (ch == 'x' || ch == 'X') {
+        return 0;
+    }
     system("cls");
 
     //init the game
@@ -226,7 +231,7 @@ int main() {
             printf("U lost :(");
             gotoxy(5, 6);
             printf("Your Score: %lld", score);
-            gotoxy(5, 6);
+            gotoxy(5, 7);
             printf("Press x to exit...");
 
             while (1) {
@@ -241,7 +246,7 @@ int main() {
             status = 2;
             print_dinosaur();
         }
-        if (status == 2 && difftime(clock(), t) > 1200) {
+        if (status == 2 && difftime(clock(), t) > 1100) {
             t = clock();
             status = 3;
             print_dinosaur();
@@ -268,12 +273,6 @@ int main() {
             printf("\n\n        It worked! I have no idea why...  :P    \n\n\n\n");
             return (0);
         }
-
-        else if (ch == 'c' || ch == 'C') {
-            gotoxy(40, 2);
-            printf("           ");
-        }
-
     }
     return 0;
 }
