@@ -6,8 +6,8 @@
 
 
 
-
-#define DURATION 50
+#define EARTH_MATERILAL '\xB2'
+#define DURATION 45
 #define DINOSAUR_X_POS 7
 #define FULL    '\xDB'
 #define UP  '\xDF'
@@ -16,7 +16,7 @@
 #define LENGTH 80
 
 int last_cactus_pos = LENGTH;
-
+long long score = 0;
 
 
 
@@ -42,8 +42,10 @@ char dinosaur[7][16] = {
     {' ', ' ', ' ', FULL, DOWN, ' ', FULL, DOWN, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
 };
 
-
+int game_over_flag = 0;
+int which_foot = 0;
 clock_t t = 0;
+clock_t t2 = 0;
 clock_t last = 0;
 int p = 49;
 int flag = 0;
@@ -140,11 +142,40 @@ int print_cactus() {
             printf("%c", cactus[i][j]);
         }
     }
+    if ((status != 2) && (last_cactus_pos + 5) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 15) {
+        game_over_flag = 1;
+    }
+}
+
+void pa_zadan() {
+    if (difftime(clock(), t2) > DURATION * 2) {
+        t2 = clock();
+        if (status == 0) {
+            gotoxy(10 + (which_foot * 3), EARTH - 1);
+            printf("%c", UP);
+            printf("%c", UP);
+            gotoxy(10 + ((!which_foot) * 3), EARTH - 1);
+            printf("%c", FULL);
+            printf("%c", DOWN);
+            which_foot ^= 1;
+        }
+    }
 }
 
 int cactus_rail() {
+
+    pa_zadan();
+
     if (difftime(clock(), last) > DURATION) {
         last = clock();
+
+        //printing the score
+        score++;
+        gotoxy(10, 1);
+        printf("%lld", score);
+        for (int i = 0; i < 10; i++)
+            printf(" ");
+
 
         gotoxy(last_cactus_pos, EARTH - 5);
         clear_cactus();
@@ -162,23 +193,55 @@ int cactus_rail() {
 
 int main() {
     char ch;
+    hidecursor();
+
+    //first screen
+    status = 2;
+    print_dinosaur();
+    gotoxy(1, 4);
+    printf("It worked! I have no idea why...");
+    gotoxy(5, 5);
+    printf("Press space to play");
+    gotoxy(6, 6);
+    printf("    x to exit");
+    ch = getch();
+    while (ch != ' ') {}
+    system("cls");
+
+    //init the game
+    status = 0;
     print_dinosaur();
     gotoxy(0, EARTH);
     for (int i = 0; i < LENGTH; i++) {
-        printf("%c", '=');
+        printf("%c", EARTH_MATERILAL);
     }
-
-    hidecursor();
+    gotoxy(3, 1);
+    printf("score: ");
 
 
     while (1) {
         cactus_rail();
+        if (game_over_flag) {
+            gotoxy(5, 5);
+            printf("U lost :(");
+            gotoxy(5, 6);
+            printf("Your Score: %lld", score);
+            gotoxy(5, 6);
+            printf("Press x to exit...");
+
+            while (1) {
+                ch = getch();
+                if (ch == 'x' || ch == 'X')
+                    return 0;
+            }
+        }
+
         if (status == 1 && difftime(clock(), t) > 100) {
             t = clock();
             status = 2;
             print_dinosaur();
         }
-        if (status == 2 && difftime(clock(), t) > 1500) {
+        if (status == 2 && difftime(clock(), t) > 1200) {
             t = clock();
             status = 3;
             print_dinosaur();
@@ -200,11 +263,17 @@ int main() {
             print_dinosaur();
         }
 
-        else if (ch == 'x') {
+        else if (ch == 'x' || ch == 'X') {
             system("cls");
             printf("\n\n        It worked! I have no idea why...  :P    \n\n\n\n");
             return (0);
         }
+
+        else if (ch == 'c' || ch == 'C') {
+            gotoxy(40, 2);
+            printf("           ");
+        }
+
     }
     return 0;
 }
