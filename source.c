@@ -227,6 +227,7 @@ int main() {
     while (1) {
         cactus_rail();
         if (game_over_flag) {
+            system("cls");
             gotoxy(5, 5);
             printf("U lost :(");
             gotoxy(5, 6);
