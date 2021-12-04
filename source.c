@@ -1,22 +1,32 @@
 #include <conio.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 #include <windows.h>
 
-
-
-#define EARTH_MATERILAL '\xB2'
-#define DURATION 45
+//configurations
+#define DURATION 40
 #define DINOSAUR_X_POS 7
-#define FULL    '\xDB'
-#define UP  '\xDF'
-#define DOWN    '\xDC'
 #define EARTH 24
 #define LENGTH 80
 
-int last_cactus_pos = LENGTH;
+//specific characters:
+#define EARTH_MATERILAL '\xB2'
+#define FULL    '\xDB'
+#define UP  '\xDF'
+#define DOWN    '\xDC'
+
+
+//global varialbes:
+char ch;
 long long score = 0;
+int last_cactus_pos = LENGTH;
+int game_over_flag = 0;
+int which_foot = 0;
+clock_t t = 0;
+clock_t t2 = 0;
+clock_t last = 0;
+int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing // 
+//it is better to have a struct for this variable :(
 
 
 
@@ -41,17 +51,6 @@ char dinosaur[7][16] = {
     {' ', ' ', UP, FULL, FULL, FULL, FULL, FULL, UP, ' ', ' ', ' ', ' ', ' ', ' ', ' '},
     {' ', ' ', ' ', FULL, DOWN, ' ', FULL, DOWN, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
 };
-
-int game_over_flag = 0;
-int which_foot = 0;
-clock_t t = 0;
-clock_t t2 = 0;
-clock_t last = 0;
-int p = 49;
-int flag = 0;
-char c;
-int on_air = 0;
-int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing / it is better to have a struct for this :/
 
 void gotoxy(int x, int y) {
     COORD coord;
@@ -142,8 +141,8 @@ int print_cactus() {
             printf("%c", cactus[i][j]);
         }
     }
-    if ((status != 2) && (last_cactus_pos + 5) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 15) {
-        game_over_flag = 1;
+    if ((status == 0) && (last_cactus_pos + 5) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 15) {
+        game_over_flag = 1;  
     }
 }
 
