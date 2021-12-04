@@ -33,16 +33,16 @@ int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing //
 //it is better to have a struct for this variable :(
 
 char cloud[3][17] = {
-    {' ',220,223,223,223,223,223,223,223,223,223,223,223,223,223,220,' '},
-    {219,176,' ',176,' ',176,' ',176,' ',176,' ',176,' ',176,' ',176,219},
-    {' ',223,220,220,220,220,220,220,220,220,220,220,220,220,220,223,' '},
+                    {' ',220,223,223,223,223,223,223,223,223,223,223,223,223,223,220,' '},
+                    {219,176,' ',176,' ',176,' ',176,' ',176,' ',176,' ',176,' ',176,219},
+                    {' ',223,220,220,220,220,220,220,220,220,220,220,220,220,220,223,' '},
 };
 
-char sun[6][7] = { {' ','\\',' '  ,'|',' '  ,'/',' '},
-    {196,' ',220,220,220,' ',196},
-    {196,' ',219,219,219,' ',196},
-    {196,' ',223,223,223,' ',196},
-    {' ','/',' ','|',' ' , '\\',' '} };
+char sun[6][7]={{' ','\\',' '  ,'|',' '  ,'/',' '},
+              {196,' ',220,220,220,' ',196},
+              {196,' ',219,219,219,' ',196},
+              {196,' ',223,223,223,' ',196},
+              {' ','/',' ','|',' ' , '\\',' '}};
 
 char mini_cactus[3][3] = {
     {FULL, ' ', DOWN},
@@ -68,19 +68,19 @@ char dinosaur[7][16] = {
 
 void SetColor(int ForgC)
 {
-    WORD wColor;
+ WORD wColor;
 
-    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+  HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+  CONSOLE_SCREEN_BUFFER_INFO csbi;
 
-    //We use csbi for the wAttributes word.
-    if (GetConsoleScreenBufferInfo(hStdOut, &csbi))
-    {
-        //Mask out all but the background attribute, and add in the forgournd     color
-        wColor = (csbi.wAttributes & 0xF0) + (ForgC & 0x0F);
-        SetConsoleTextAttribute(hStdOut, wColor);
-    }
-    return;
+                   //We use csbi for the wAttributes word.
+ if(GetConsoleScreenBufferInfo(hStdOut, &csbi))
+ {
+             //Mask out all but the background attribute, and add in the forgournd     color
+      wColor = (csbi.wAttributes & 0xF0) + (ForgC & 0x0F);
+      SetConsoleTextAttribute(hStdOut, wColor);
+ }
+ return;
 }
 
 
@@ -179,6 +179,9 @@ int print_cactus() {
     if ((status == 0) && (last_cactus_pos + 7) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 15) {
         game_over_flag = 1;
     }
+    else if ((status != 2 && status != 0) && (last_cactus_pos + 10 ) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 14) {
+        game_over_flag = 1;
+    }
 }
 
 void pa_zadan() {
@@ -198,8 +201,8 @@ void pa_zadan() {
     SetColor(15);
 }
 
-double speed(long long score) {
-    return (1.0 + (score / 1000) * 0.4);
+double speed(long long score){
+    return (1.0 + (score/500)*0.2);
 }
 
 int cactus_rail() {
@@ -281,69 +284,69 @@ int main() {
 
     //printing cloud 1&2&3
 
-    gotoxy(30, 5);
-    for (int i = 0; i < 3; i++)
-    {
-        // printf("%*s",35," ");
-        SetColor(11);
-        for (int j = 0; j < 17; j++)
+        gotoxy(30,5);
+        for (int i = 0; i < 3; i++)
         {
-            printf("%c", cloud[i][j]);
+           // printf("%*s",35," ");
+            SetColor(11);
+            for (int j = 0; j < 17; j++)
+            {
+                printf("%c",cloud[i][j]);
+            }
+            printf("\n");
+            printf("%*.S",30," ");
         }
-        printf("\n");
-        printf("%*.S", 30, " ");
-    }
-    SetColor(15);
+        SetColor(15);
 
 
-    gotoxy(60, 1);
-    for (int i = 0; i < 3; i++)
-    {
-        // printf("%*s",35," ");
-        SetColor(11);
-        for (int j = 0; j < 17; j++)
+        gotoxy(60,1);
+        for (int i = 0; i < 3; i++)
         {
-            printf("%c", cloud[i][j]);
+           // printf("%*s",35," ");
+            SetColor(11);
+            for (int j = 0; j < 17; j++)
+            {
+                printf("%c",cloud[i][j]);
+            }
+            printf("\n");
+            printf("%*.S",60," ");
         }
-        printf("\n");
-        printf("%*.S", 60, " ");
-    }
-    SetColor(15);
+        SetColor(15);
 
 
-    gotoxy(50, 7);
-    for (int i = 0; i < 3; i++)
-    {
-        // printf("%*s",35," ");
-        SetColor(11);
-        for (int j = 0; j < 17; j++)
+        gotoxy(50,7);
+        for (int i = 0; i < 3; i++)
         {
-            printf("%c", cloud[i][j]);
+           // printf("%*s",35," ");
+            SetColor(11);
+            for (int j = 0; j < 17; j++)
+            {
+                printf("%c",cloud[i][j]);
+            }
+            printf("\n");
+            printf("%*.S",50," ");
         }
-        printf("\n");
-        printf("%*.S", 50, " ");
-    }
 
-    //printing sun
+        //printing sun
 
-    for (int i = 0; i < 6; i++)
-    {
-        // printf("%*s",35," ");
-        SetColor(14);
-        for (int j = 0; j < 7; j++)
+        for (int i = 0; i < 6; i++)
         {
-            gotoxy(48 + j, 1 + i);
-            printf("%c", sun[i][j]);
+           // printf("%*s",35," ");
+            SetColor(14);
+            for (int j = 0; j < 7; j++)
+            {
+                gotoxy(48+j,1+i);
+                printf("%c",sun[i][j]);
+            }
+            printf("\n");
+            //printf("%*.S",20," ");
         }
-        printf("\n");
-        //printf("%*.S",20," ");
-    }
-    SetColor(15);
+        SetColor(15);
 
     while (1) {
         cactus_rail();
         if (game_over_flag) {
-            //system("cls");
+            system("cls");
             gotoxy(5, 5);
             SetColor(1);
             printf("U lost :(");
@@ -373,7 +376,7 @@ int main() {
             print_dinosaur();
             SetColor(15);
         }
-        if (status == 2 && difftime(clock(), t) > 1100 / speed(score)) {
+        if (status == 2 && difftime(clock(), t) > 900/speed(score)) {
             t = clock();
             status = 3;
             SetColor(4);
