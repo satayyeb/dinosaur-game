@@ -258,6 +258,19 @@ int main() {
             print_dinosaur();
         }
 
+        if (status != 0 && kbhit()) {
+            ch = getch();
+
+            if (ch == 'G') {
+                score -= 100;
+                if (score < 0)
+                    score = 0;
+            }
+
+            if (ch == 'H')
+                score += 100;
+        }
+
         if (status != 0 || !kbhit()) {
             continue;
         }
@@ -268,6 +281,15 @@ int main() {
             status = 1;
             print_dinosaur();
         }
+
+        if (ch == 'G') {
+            score -= 100;
+            if (score < 0)
+                score = 0;
+        }
+
+        if (ch == 'H')
+            score += 100;
 
         else if (ch == 'x' || ch == 'X') {
             system("cls");
