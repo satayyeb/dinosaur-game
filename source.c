@@ -141,7 +141,7 @@ int print_cactus() {
             printf("%c", cactus[i][j]);
         }
     }
-    if ((status == 0) && (last_cactus_pos + 5) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 15) {
+    if ((status == 0) && (last_cactus_pos + 7) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 15) {
         game_over_flag = 1;  
     }
 }
