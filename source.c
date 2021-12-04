@@ -3,8 +3,9 @@
 #include <time.h>
 #include <windows.h>
 #include <stdlib.h>
-#include <dos.h>
-#include <dir.h>
+#include <direct.h>
+#include <io.h>
+
 
 //configurations
 #define DURATION 30
