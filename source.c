@@ -201,7 +201,7 @@ void pa_zadan() {
     SetColor(15);
 }
 
-double speed(long long score){
+double  speed(long long score){
     return (1.0 + (score/500)*0.2);
 }
 
@@ -249,8 +249,8 @@ int main() {
     gotoxy(6, 6);
     printf("    x to exit");
     SetColor(15);
+    
     ch = getch();
-
     while (ch != ' ' && ch != 'x' && ch != 'X') {
         ch = getch();
     }
