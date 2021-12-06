@@ -46,27 +46,36 @@ int which_foot = 0;
 clock_t t = 0;
 clock_t t2 = 0;
 clock_t last = 0;
-int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing 
+int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing
                 //it is better to have a enum for this variable :(
+
+#define CLOUD_HEIGHT 3
+#define CLOUD_WIDTH 17
+#define SUN_HEIGHT 6
+#define SUN_WIDTH 7
+#define MOON_HEIGHT 4
+#define MOON_WIDTH 7
+#define CACTUS_HEIGHT 5
+#define CACTUS_WIDTH 5
 
 enum COLOR {
     Black, Blue, Green, Aqua, Red, Purple, Yellow, White,
     Gray, LightBlue, LightGreen, LightAqua, LightRed, LightPurple, LightYellow, BrightWhite
 };
 
-char cloud[3][17] = {
+char cloud[CLOUD_HEIGHT][CLOUD_WIDTH] = {
     {' ',220,223,223,223,223,223,223,223,223,223,223,223,223,223,220,' '},
     {219,176,' ',176,' ',176,' ',176,' ',176,' ',176,' ',176,' ',176,219},
     {' ',223,220,220,220,220,220,220,220,220,220,220,220,220,220,223,' '},
 };
 
-char moon[4][7] = {
+char moon[MOON_HEIGHT][MOON_WIDTH] = {
     {220,223 ,223,219,219,220,' '},
     {' ',' ' , ' ',' ',219,219,219},
     {223,220,220,219,219,223,' '},
 };
 
-char sun[6][7] = { {' ','\\',' '  ,'|',' '  ,'/',' '},
+char sun[SUN_HEIGHT][SUN_WIDTH] = { {' ','\\',' '  ,'|',' '  ,'/',' '},
     {196,' ',220,220,220,' ',196},
     {196,' ',219,219,219,' ',196},
     {196,' ',223,223,223,' ',196},
@@ -104,7 +113,9 @@ void faster_the_speed();
 void cactus_rail();
 void clear_cactus();
 void print_cactus();
-
+void print_cloud(int x, int y);
+void print_sun(int x, int y);
+void print_moon(int x, int y);
 
 //the main function
 int main() {
@@ -114,6 +125,7 @@ int main() {
     //first screen
     status = 2;
     print_dinosaur();
+
     SetColor(Purple);
     gotoxy(8, 3);
     printf("Dinosaur Game");
@@ -137,68 +149,28 @@ int main() {
     //init the game
     status = 0;
     print_dinosaur();
-    SetColor(BrightWhite);
+
     gotoxy(0, EARTH);
     SetColor(6);
     for (int i = 0; i < LENGTH; i++) {
         printf("%c", EARTH_MATERILAL);
     }
+
     SetColor(BrightWhite);
     gotoxy(3, 1);
     printf("score: ");
 
-
     //printing cloud 1&2&3
-    gotoxy(30, 5);
-    for (int i = 0; i < 3; i++)
-    {
-        // printf("%*s",35," ");
-        SetColor(LightAqua);
-        for (int j = 0; j < 17; j++)
-        {
-            printf("%c", cloud[i][j]);
-        }
-        printf("\n");
-        printf("%*.S", 30, " ");
-    }
-
-    gotoxy(60, 1);
-    for (int i = 0; i < 3; i++)
-    {
-        SetColor(LightAqua);
-        for (int j = 0; j < 17; j++)
-        {
-            printf("%c", cloud[i][j]);
-        }
-        printf("\n");
-        printf("%*.S", 60, " ");
-    }
-    SetColor(BrightWhite);
-
-
-    gotoxy(50, 7);
-    for (int i = 0; i < 3; i++)
-    {
-        // printf("%*s",35," ");
-        SetColor(LightAqua);
-        for (int j = 0; j < 17; j++)
-        {
-            printf("%c", cloud[i][j]);
-        }
-        printf("\n");
-        printf("%*.S", 50, " ");
-    }
-
-
+    print_cloud(30, 5);
+    print_cloud(60, 1);
+    print_cloud(50, 7);
 
     while (1) {
 
         if (last_cactus_pos == LENGTH) {
             faster_the_speed();
         }
-
         cactus_rail();
-
 
         if (game_over_flag) {
             system("cls");
@@ -220,124 +192,52 @@ int main() {
             }
         }
 
-
-
-        if ((score / 500) % 2 == 0)
-        {
-            //printing sun
-            for (int i = 0; i < 6; i++)
-            {
-                // printf("%*s",35," ");
-                SetColor(LightYellow);
-                for (int j = 0; j < 7; j++)
-                {
-                    gotoxy(48 + j, 1 + i);
-                    printf("%c", sun[i][j]);
-                }
-                printf("\n");
-                //printf("%*.S",20," ");
-            }
-            SetColor(BrightWhite);
-            //printing cloud 1&2&3
+        if ((score / 500) % 2 == 0) {
+            print_sun(48, 1);
         } else if ((score / 500) % 2 == 1) {
-            SetColor(BrightWhite);
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 7; ++j) {
-                    gotoxy(48 + j, 1 + i);
-                    printf("%c", moon[i][j]);
-                }
-                printf("\n");
-            }
-            SetColor(BrightWhite);
-            gotoxy(48, 4);
-            printf("                       \n            ");
-            gotoxy(48, 5);
-            printf("                   \n             ");
+            print_moon(48, 1);
         }
         SetColor(BrightWhite);
-
-
-
-
 
         if (status == 1 && difftime(clock(), t) > duration * 2) {
             t = clock();
             status = 2;
             print_dinosaur();
-            SetColor(BrightWhite);
         }
         if (status == 2 && difftime(clock(), t) > (duration * 35 / speed) + 12) {
             t = clock();
             status = 3;
             print_dinosaur();
-            SetColor(BrightWhite);
         }
         if (status == 3 && difftime(clock(), t) > duration * 2) {
             t = clock();
             status = 0;
             print_dinosaur();
-            SetColor(BrightWhite);
         }
 
-
-
-
-        if (status != 0 && kbhit()) {
+        if (kbhit()) {
             ch = getch();
-            if (ch == 'G') {
+            if (status == 0 && ch == ' ') {
+                t = clock();
+                status = 1;
+                print_dinosaur();
+            } else if (ch == 'G') {
                 score -= 100;
-                if (score < 0)
-                    score = 0;
-            }
-            if (ch == 'H')
+                if (score < 0) score = 0;
+            } else if (ch == 'H') {
                 score += 100;
-        }
-
-        if (status != 0 || !kbhit()) {
-            continue;
-        }
-
-        ch = getch();
-        if (ch == ' ') {
-            t = clock();
-            status = 1;
-            print_dinosaur();
-            SetColor(BrightWhite);
-        }
-
-        if (ch == 'G') {
-            score -= 100;
-            if (score < 0)
-                score = 0;
-        }
-
-        if (ch == 'H')
-            score += 100;
-        else if (ch == 'x' || ch == 'X') {
-            SetColor(LightYellow);
-            system("cls");
-            printf("\n\n        It worked! I have no idea why...  :P    \n\n\n\n");
-            SetColor(BrightWhite);
-            return (0);
+            } else if (ch == 'x' || ch == 'X') {
+                SetColor(LightYellow);
+                system("cls");
+                printf("\n\n        It worked! I have no idea why...  :P    \n\n\n\n");
+                SetColor(BrightWhite);
+                return (0);
+            }
         }
     }
-    return 0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// ---------------------- function definitions --------------------------------
 
 void faster_the_speed() {
     if (1 <= score && score < 150) {
@@ -372,7 +272,7 @@ void cactus_rail() {
 
 
         gotoxy(last_cactus_pos, EARTH - 5);
-        clear_cactus();
+        clear_cactus(last_cactus_pos, EARTH - 5);
 
         last_cactus_pos -= speed;
         if (last_cactus_pos <= 0) {
@@ -380,7 +280,7 @@ void cactus_rail() {
             return;
         }
 
-        print_cactus();
+        print_cactus(last_cactus_pos, EARTH - 5);
     }
 }
 
@@ -411,12 +311,12 @@ void pa_zadan() {
     SetColor(BrightWhite);
 }
 
-void print_cactus() {
+void print_cactus(int x, int y) {
     SetColor(Green);
-    for (int i = 0; i < 5; i++) {
-        gotoxy(last_cactus_pos, EARTH - 5 + i);
-        for (int j = 0; j < 5; j++) {
-            printf("%c", cactus[i][j]);
+    for (int i = 0; i < CACTUS_HEIGHT; i++) {
+        gotoxy(x, y + i);
+        for (int j = 0; j < CACTUS_WIDTH; j++) {
+            putchar(cactus[i][j]);
         }
     }
     SetColor(BrightWhite);
@@ -427,13 +327,51 @@ void print_cactus() {
     }
 }
 
-void clear_cactus() {
-    for (int i = 0; i < 5; i++) {
-        gotoxy(last_cactus_pos, EARTH - 5 + i);
-        for (int j = 0; j < 5; j++) {
-            printf("%c", ' ');
+void clear_cactus(int x, int y) {
+    for (int i = 0; i < CACTUS_HEIGHT; i++) {
+        gotoxy(x, y + i);
+        for (int j = 0; j < CACTUS_WIDTH; j++) {
+            putchar(' ');
         }
     }
+}
+
+void print_cloud(int x, int y) {
+    SetColor(LightAqua);
+    for (int i = 0; i < CLOUD_HEIGHT; i++) {
+        gotoxy(x, y + i);
+        for (int j = 0; j < CLOUD_WIDTH; j++) {
+            putchar(cloud[i][j]);
+        }
+    }
+    SetColor(BrightWhite);
+}
+
+void print_sun(int x, int y) {
+    SetColor(LightYellow);
+    for (int i = 0; i < SUN_HEIGHT; i++) {
+        gotoxy(x, y + i);
+        for (int j = 0; j < SUN_WIDTH; j++) {
+            putchar(sun[i][j]);
+        }
+    }
+    SetColor(BrightWhite);
+}
+
+void print_moon(int x, int y) {
+    SetColor(BrightWhite);
+    for (int i = 0; i < MOON_HEIGHT; i++) {
+        gotoxy(x, y + i);
+        for (int j = 0; j < MOON_WIDTH; j++) {
+            putchar(moon[i][j]);
+        }
+    }
+    // erase sun under moon
+    gotoxy(x, y + 3);
+    printf("                       \n            ");
+    gotoxy(x, y + 4);
+    printf("                   \n             ");
+    SetColor(BrightWhite);
 }
 
 void print_dinosaur() {
@@ -495,6 +433,8 @@ void print_dinosaur() {
         }
         printf("\n");
     }
+
+    SetColor(BrightWhite);
 }
 
 void hidecursor() {
