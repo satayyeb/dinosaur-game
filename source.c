@@ -48,7 +48,7 @@ clock_t t = 0;
 clock_t t2 = 0;
 clock_t last = 0;
 int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing
-                //it is better to have a enum for this variable :(
+                //it is better to have an enum for this variable :(
 
 #define CLOUD_HEIGHT 3
 #define CLOUD_WIDTH 17
@@ -193,7 +193,7 @@ int main() {
             printf("Press x to exit...");
             SetColor(BrightWhite);
 
-            // last_music();
+            //last_music();
 
             while (1) {
                 ch = getch();
