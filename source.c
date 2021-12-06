@@ -6,10 +6,10 @@
 #include <stdlib.h>
 
 //configurations
-#define duration  40        //The length of time that cactus moves
-#define DINOSAUR_X_POS 7    //the X-position of dinosaur
-#define EARTH 24            //the Y-position of the earth
-#define LENGTH 90           //the length of the earth
+#define duration  40           //The length of time that cactus moves
+#define DINOSAUR_X 7           //the X-position of dinosaur
+#define EARTH_Y 24             //the Y-position of the earth
+// #define EARTH_LEN 160           //the length of the earth
 
 //specific characters:
 #define EARTH_MATERILAL '\xB2'
@@ -38,9 +38,10 @@
 
 //global varialbes:
 char ch;
+int earth_len; // will be assigned at start;
 long long score = 0;
 int speed = 1;
-int last_cactus_pos = LENGTH;
+int last_cactus_pos; // set to window width;
 int game_over_flag = 0;
 int which_foot = 0;
 clock_t t = 0;
@@ -57,6 +58,8 @@ int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing
 #define MOON_WIDTH 7
 #define CACTUS_HEIGHT 5
 #define CACTUS_WIDTH 5
+#define DINOSAUR_HEIGHT 7
+#define DINOSAUR_WIDTH 16
 
 enum COLOR {
     Black, Blue, Green, Aqua, Red, Purple, Yellow, White,
@@ -82,16 +85,14 @@ char sun[SUN_HEIGHT][SUN_WIDTH] = { {' ','\\',' '  ,'|',' '  ,'/',' '},
     {' ','/',' ','|',' ' , '\\',' '}
 };
 
-char cactus[5][5] = {
+char cactus[CACTUS_HEIGHT][CACTUS_WIDTH] = {
     {' ', ' ', DOWN, ' ', ' '},
     {FULL, ' ', FULL, ' ', FULL},
     {FULL, ' ', FULL, ' ', FULL},
     {UP, UP, FULL, UP, UP},
     {' ', ' ', FULL, ' ', ' '} };
 
-int dinosaur_higth = 7;
-int dinosaur_width = 16;
-char dinosaur[7][16] = {
+char dinosaur[DINOSAUR_HEIGHT][DINOSAUR_WIDTH] = {
     {' ' , ' ', ' ', ' ', ' ', ' ', ' ', ' ',DOWN,FULL,UP  ,FULL,FULL,FULL,FULL,DOWN},
     {' ' , ' ', ' ', ' ', ' ', ' ', ' ', ' ',FULL,FULL,FULL,FULL,DOWN,DOWN,DOWN, ' '},
     {FULL, ' ', ' ', ' ', ' ', ' ',DOWN,FULL,FULL,FULL,FULL, ' ', ' ', ' ', ' ', ' '},
@@ -101,13 +102,17 @@ char dinosaur[7][16] = {
     {' ' , ' ', ' ',FULL,DOWN, ' ',FULL,DOWN,' ' , ' ', ' ', ' ', ' ', ' ', ' ', ' '},
 };
 
+HWND hwnd;
+CONSOLE_SCREEN_BUFFER_INFO csbi;
+HANDLE consoleHandle;
+
 //functions prototype:
 void SetColor(int ForgC);
 void gotoxy(int x, int y);
 void hidecursor();
 void print_dinosaur();
 void pa_zadan();
-void check_is_X_pressed();
+void exit_if_X_pressed();
 void last_music();
 void faster_the_speed();
 void cactus_rail();
@@ -116,11 +121,15 @@ void print_cactus();
 void print_cloud(int x, int y);
 void print_sun(int x, int y);
 void print_moon(int x, int y);
+void initialize_console();
 
 //the main function
 int main() {
 
-    hidecursor();
+    initialize_console();
+
+    earth_len = csbi.dwSize.X - 5;
+    last_cactus_pos = earth_len;
 
     //first screen
     status = 2;
@@ -150,14 +159,15 @@ int main() {
     status = 0;
     print_dinosaur();
 
-    gotoxy(0, EARTH);
-    SetColor(6);
-    for (int i = 0; i < LENGTH; i++) {
-        printf("%c", EARTH_MATERILAL);
+    // print earth
+    gotoxy(0, EARTH_Y);
+    SetColor(Yellow);
+    for (int i = 0; i < earth_len; i++) {
+        putchar(EARTH_MATERILAL);
     }
 
-    SetColor(BrightWhite);
     gotoxy(3, 1);
+    SetColor(BrightWhite);
     printf("score: ");
 
     //printing cloud 1&2&3
@@ -167,7 +177,7 @@ int main() {
 
     while (1) {
 
-        if (last_cactus_pos == LENGTH) {
+        if (last_cactus_pos == earth_len) {
             faster_the_speed();
         }
         cactus_rail();
@@ -268,30 +278,26 @@ void cactus_rail() {
         gotoxy(10, 1);
         printf("%lld", score);
         for (int i = 0; i < 10; i++)
-            printf(" ");
+            putchar(' ');
 
 
-        gotoxy(last_cactus_pos, EARTH - 5);
-        clear_cactus(last_cactus_pos, EARTH - 5);
+        clear_cactus(last_cactus_pos, EARTH_Y - 5);
 
         last_cactus_pos -= speed;
         if (last_cactus_pos <= 0) {
-            last_cactus_pos = LENGTH;
+            last_cactus_pos = earth_len;
             return;
         }
 
-        print_cactus(last_cactus_pos, EARTH - 5);
+        print_cactus(last_cactus_pos, EARTH_Y - 5);
     }
 }
 
-void check_is_X_pressed() {
-    if (!kbhit())
-        return;
-    ch = getch();
-    if (ch == 'x' || ch == 'X')
-        exit(0);
-    else
-        return;
+void exit_if_X_pressed() {
+    if (kbhit()) {
+        ch = getch();
+        if (ch == 'x' || ch == 'X') exit(0);
+    }
 }
 
 void pa_zadan() {
@@ -299,12 +305,12 @@ void pa_zadan() {
     if (difftime(clock(), t2) > duration * 2) {
         t2 = clock();
         if (status == 0) {
-            gotoxy(10 + (which_foot * 3), EARTH - 1);
-            printf("%c", UP);
-            printf("%c", UP);
-            gotoxy(10 + ((!which_foot) * 3), EARTH - 1);
-            printf("%c", FULL);
-            printf("%c", DOWN);
+            gotoxy(10 + (which_foot * 3), EARTH_Y - 1);
+            putchar(UP);
+            putchar(UP);
+            gotoxy(10 + ((!which_foot) * 3), EARTH_Y - 1);
+            putchar(FULL);
+            putchar(DOWN);
             which_foot ^= 1;
         }
     }
@@ -320,9 +326,9 @@ void print_cactus(int x, int y) {
         }
     }
     SetColor(BrightWhite);
-    if ((status == 0) && (last_cactus_pos + 7) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 15) {
+    if ((status == 0) && (last_cactus_pos + 7) > DINOSAUR_X && last_cactus_pos < DINOSAUR_X + 15) {
         game_over_flag = 1;
-    } else if ((status != 2 && status != 0) && (last_cactus_pos + 10) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 14) {
+    } else if ((status != 2 && status != 0) && (last_cactus_pos + 10) > DINOSAUR_X && last_cactus_pos < DINOSAUR_X + 14) {
         game_over_flag = 1;
     }
 }
@@ -381,42 +387,42 @@ void print_dinosaur() {
     //go to the last position
     switch (status) {
     case 0:
-        gotoxy(0, EARTH - 10);
+        gotoxy(0, EARTH_Y - 10);
         break;
     case 1:
-        gotoxy(0, EARTH - 7);
+        gotoxy(0, EARTH_Y - 7);
         break;
     case 2:
-        gotoxy(0, EARTH - 10);
+        gotoxy(0, EARTH_Y - 10);
         break;
     case 3:
-        gotoxy(0, EARTH - 13);
+        gotoxy(0, EARTH_Y - 13);
         break;
     default:
         break;
     }
 
     //erase the previous dinosaur
-    for (int i = 0; i < dinosaur_higth; i++) {
-        for (int j = 0; j < dinosaur_width + DINOSAUR_X_POS; j++) {
-            printf("%c", ' ');
+    for (int i = 0; i < DINOSAUR_HEIGHT; i++) {
+        for (int j = 0; j < DINOSAUR_WIDTH + DINOSAUR_X; j++) {
+            putchar(' ');
         }
-        printf("\n");
+        putchar('\n');
     }
 
     //go to the next position
     switch (status) {
     case 0:
-        gotoxy(0, EARTH - 7);
+        gotoxy(0, EARTH_Y - 7);
         break;
     case 1:
-        gotoxy(0, EARTH - 10);
+        gotoxy(0, EARTH_Y - 10);
         break;
     case 2:
-        gotoxy(0, EARTH - 13);
+        gotoxy(0, EARTH_Y - 13);
         break;
     case 3:
-        gotoxy(0, EARTH - 10);
+        gotoxy(0, EARTH_Y - 10);
         break;
     default:
         break;
@@ -424,21 +430,29 @@ void print_dinosaur() {
 
     //print the dinosaur
 
-    for (int i = 0; i < dinosaur_higth; i++) {
-        for (int i = 0; i < DINOSAUR_X_POS; i++) {
-            printf(" ");
+    for (int i = 0; i < DINOSAUR_HEIGHT; i++) {
+        for (int i = 0; i < DINOSAUR_X; i++) {
+            putchar(' ');
         }
-        for (int j = 0; j < dinosaur_width; j++) {
-            printf("%c", dinosaur[i][j]);
+        for (int j = 0; j < DINOSAUR_WIDTH; j++) {
+            putchar(dinosaur[i][j]);
         }
-        printf("\n");
+        putchar('\n');
     }
 
     SetColor(BrightWhite);
 }
 
+void initialize_console() {
+    hwnd = GetConsoleWindow();
+    ShowWindow(hwnd, SW_SHOWMAXIMIZED);
+    consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleScreenBufferInfo(consoleHandle, &csbi);
+
+    hidecursor();
+}
+
 void hidecursor() {
-    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO info;
     info.dwSize = 100;
     info.bVisible = FALSE;
@@ -449,97 +463,84 @@ void gotoxy(int x, int y) {
     COORD coord;
     coord.X = x;
     coord.Y = y;
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    SetConsoleCursorPosition(consoleHandle, coord);
 }
 
-void SetColor(int ForgC)
-{
-    WORD wColor;
-
-    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-
-    //We use csbi for the wAttributes word.
-    if (GetConsoleScreenBufferInfo(hStdOut, &csbi))
-    {
-        //Mask out all but the background attribute, and add in the forgournd     color
-        wColor = (csbi.wAttributes & 0xF0) + (ForgC & 0x0F);
-        SetConsoleTextAttribute(hStdOut, wColor);
-    }
-    return;
+void SetColor(int ForgC) {
+    WORD wColor = (csbi.wAttributes & 0xF0) + (ForgC & 0x0F);
+    SetConsoleTextAttribute(consoleHandle, wColor);
 }
-
 
 void last_music() {
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Sleep(half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Sleep(half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(G5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(C5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(D5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(C4, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(D4, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E4, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(F5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(F5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(F5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Sleep(half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(F5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Sleep(half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(D5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(D5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(D5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Sleep(half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(G5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(D5, half);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(G5, half * 1.1);
-    check_is_X_pressed();
+    exit_if_X_pressed();
     Beep(E5, half * 1.2);
-    check_is_X_pressed();
+    exit_if_X_pressed();
 }
