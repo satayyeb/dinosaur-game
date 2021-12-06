@@ -5,7 +5,6 @@
 #include <windows.h>
 #include <stdlib.h>
 
-
 //configurations
 #define duration  40        //The length of time that cactus moves
 #define DINOSAUR_X_POS 7    //the X-position of dinosaur
@@ -37,7 +36,6 @@
 #define full 450
 #define half full
 
-
 //global varialbes:
 char ch;
 long long score = 0;
@@ -51,8 +49,10 @@ clock_t last = 0;
 int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing 
                 //it is better to have a enum for this variable :(
 
-
-
+enum COLOR {
+    Black, Blue, Green, Aqua, Red, Purple, Yellow, White,
+    Gray, LightBlue, LightGreen, LightAqua, LightRed, LightPurple, LightYellow, BrightWhite
+};
 
 char cloud[3][17] = {
     {' ',220,223,223,223,223,223,223,223,223,223,223,223,223,223,220,' '},
@@ -92,7 +92,6 @@ char dinosaur[7][16] = {
     {' ' , ' ', ' ',FULL,DOWN, ' ',FULL,DOWN,' ' , ' ', ' ', ' ', ' ', ' ', ' ', ' '},
 };
 
-
 //functions prototype:
 void SetColor(int ForgC);
 void gotoxy(int x, int y);
@@ -107,11 +106,6 @@ void clear_cactus();
 void print_cactus();
 
 
-
-
-
-
-
 //the main function
 int main() {
 
@@ -119,9 +113,8 @@ int main() {
 
     //first screen
     status = 2;
-    SetColor(4);
     print_dinosaur();
-    SetColor(5);
+    SetColor(Purple);
     gotoxy(8, 3);
     printf("Dinosaur Game");
     gotoxy(1, 4);
@@ -130,13 +123,12 @@ int main() {
     printf("Press space to play");
     gotoxy(6, 6);
     printf("    x to exit");
-    SetColor(15);
+    SetColor(BrightWhite);
 
-
-    ch = getch();
-    while (ch != ' ' && ch != 'x' && ch != 'X') {
+    do {
         ch = getch();
-    }
+    } while (ch != ' ' && ch != 'x' && ch != 'X');
+
     if (ch == 'x' || ch == 'X') {
         return 0;
     }
@@ -144,15 +136,14 @@ int main() {
 
     //init the game
     status = 0;
-    SetColor(4);
     print_dinosaur();
-    SetColor(15);
+    SetColor(BrightWhite);
     gotoxy(0, EARTH);
     SetColor(6);
     for (int i = 0; i < LENGTH; i++) {
         printf("%c", EARTH_MATERILAL);
     }
-    SetColor(15);
+    SetColor(BrightWhite);
     gotoxy(3, 1);
     printf("score: ");
 
@@ -162,7 +153,7 @@ int main() {
     for (int i = 0; i < 3; i++)
     {
         // printf("%*s",35," ");
-        SetColor(11);
+        SetColor(LightAqua);
         for (int j = 0; j < 17; j++)
         {
             printf("%c", cloud[i][j]);
@@ -174,7 +165,7 @@ int main() {
     gotoxy(60, 1);
     for (int i = 0; i < 3; i++)
     {
-        SetColor(11);
+        SetColor(LightAqua);
         for (int j = 0; j < 17; j++)
         {
             printf("%c", cloud[i][j]);
@@ -182,14 +173,14 @@ int main() {
         printf("\n");
         printf("%*.S", 60, " ");
     }
-    SetColor(15);
+    SetColor(BrightWhite);
 
 
     gotoxy(50, 7);
     for (int i = 0; i < 3; i++)
     {
         // printf("%*s",35," ");
-        SetColor(11);
+        SetColor(LightAqua);
         for (int j = 0; j < 17; j++)
         {
             printf("%c", cloud[i][j]);
@@ -212,15 +203,15 @@ int main() {
         if (game_over_flag) {
             system("cls");
             gotoxy(5, 5);
-            SetColor(1);
+            SetColor(Blue);
             printf("U lost :(");
             gotoxy(5, 6);
             printf("Your Score: %lld", score);
             gotoxy(5, 7);
             printf("Press x to exit...");
-            SetColor(15);
+            SetColor(BrightWhite);
 
-            last_music();
+            // last_music();
 
             while (1) {
                 ch = getch();
@@ -237,7 +228,7 @@ int main() {
             for (int i = 0; i < 6; i++)
             {
                 // printf("%*s",35," ");
-                SetColor(14);
+                SetColor(LightYellow);
                 for (int j = 0; j < 7; j++)
                 {
                     gotoxy(48 + j, 1 + i);
@@ -246,10 +237,10 @@ int main() {
                 printf("\n");
                 //printf("%*.S",20," ");
             }
-            SetColor(15);
+            SetColor(BrightWhite);
             //printing cloud 1&2&3
         } else if ((score / 500) % 2 == 1) {
-            SetColor(15);
+            SetColor(BrightWhite);
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 7; ++j) {
                     gotoxy(48 + j, 1 + i);
@@ -257,13 +248,13 @@ int main() {
                 }
                 printf("\n");
             }
-            SetColor(15);
+            SetColor(BrightWhite);
             gotoxy(48, 4);
             printf("                       \n            ");
             gotoxy(48, 5);
             printf("                   \n             ");
         }
-        SetColor(15);
+        SetColor(BrightWhite);
 
 
 
@@ -272,23 +263,20 @@ int main() {
         if (status == 1 && difftime(clock(), t) > duration * 2) {
             t = clock();
             status = 2;
-            SetColor(4);
             print_dinosaur();
-            SetColor(15);
+            SetColor(BrightWhite);
         }
         if (status == 2 && difftime(clock(), t) > (duration * 35 / speed) + 12) {
             t = clock();
             status = 3;
-            SetColor(4);
             print_dinosaur();
-            SetColor(15);
+            SetColor(BrightWhite);
         }
         if (status == 3 && difftime(clock(), t) > duration * 2) {
             t = clock();
             status = 0;
-            SetColor(4);
             print_dinosaur();
-            SetColor(15);
+            SetColor(BrightWhite);
         }
 
 
@@ -313,9 +301,8 @@ int main() {
         if (ch == ' ') {
             t = clock();
             status = 1;
-            SetColor(4);
             print_dinosaur();
-            SetColor(15);
+            SetColor(BrightWhite);
         }
 
         if (ch == 'G') {
@@ -327,10 +314,10 @@ int main() {
         if (ch == 'H')
             score += 100;
         else if (ch == 'x' || ch == 'X') {
-            SetColor(14);
+            SetColor(LightYellow);
             system("cls");
             printf("\n\n        It worked! I have no idea why...  :P    \n\n\n\n");
-            SetColor(15);
+            SetColor(BrightWhite);
             return (0);
         }
     }
@@ -408,7 +395,7 @@ void check_is_X_pressed() {
 }
 
 void pa_zadan() {
-    SetColor(4);
+    SetColor(Red);
     if (difftime(clock(), t2) > duration * 2) {
         t2 = clock();
         if (status == 0) {
@@ -421,18 +408,18 @@ void pa_zadan() {
             which_foot ^= 1;
         }
     }
-    SetColor(15);
+    SetColor(BrightWhite);
 }
 
 void print_cactus() {
-    SetColor(2);
+    SetColor(Green);
     for (int i = 0; i < 5; i++) {
         gotoxy(last_cactus_pos, EARTH - 5 + i);
         for (int j = 0; j < 5; j++) {
             printf("%c", cactus[i][j]);
         }
     }
-    SetColor(15);
+    SetColor(BrightWhite);
     if ((status == 0) && (last_cactus_pos + 7) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 15) {
         game_over_flag = 1;
     } else if ((status != 2 && status != 0) && (last_cactus_pos + 10) > DINOSAUR_X_POS && last_cactus_pos < DINOSAUR_X_POS + 14) {
@@ -450,6 +437,8 @@ void clear_cactus() {
 }
 
 void print_dinosaur() {
+
+    SetColor(Red);
 
     //go to the last position
     switch (status) {
