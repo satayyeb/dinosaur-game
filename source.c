@@ -47,7 +47,7 @@ clock_t t = 0;
 clock_t t2 = 0;
 clock_t last = 0;
 int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing
-                //it is better to have a enum for this variable :(
+                //it is better to have an enum for this variable :(
 
 #define CLOUD_HEIGHT 3
 #define CLOUD_WIDTH 17
@@ -57,6 +57,9 @@ int status = 0; // 0= on earth / 1= jumping / 2= on air / 3= landing
 #define MOON_WIDTH 7
 #define CACTUS_HEIGHT 5
 #define CACTUS_WIDTH 5
+#define DINOSAUR_HEIGHT 7
+#define DINOSAUR_WIDTH 16
+
 
 enum COLOR {
     Black, Blue, Green, Aqua, Red, Purple, Yellow, White,
@@ -89,9 +92,8 @@ char cactus[5][5] = {
     {UP, UP, FULL, UP, UP},
     {' ', ' ', FULL, ' ', ' '} };
 
-int dinosaur_higth = 7;
-int dinosaur_width = 16;
-char dinosaur[7][16] = {
+
+char dinosaur[DINOSAUR_HEIGHT][DINOSAUR_WIDTH] = {
     {' ' , ' ', ' ', ' ', ' ', ' ', ' ', ' ',DOWN,FULL,UP  ,FULL,FULL,FULL,FULL,DOWN},
     {' ' , ' ', ' ', ' ', ' ', ' ', ' ', ' ',FULL,FULL,FULL,FULL,DOWN,DOWN,DOWN, ' '},
     {FULL, ' ', ' ', ' ', ' ', ' ',DOWN,FULL,FULL,FULL,FULL, ' ', ' ', ' ', ' ', ' '},
@@ -183,7 +185,7 @@ int main() {
             printf("Press x to exit...");
             SetColor(BrightWhite);
 
-            // last_music();
+            //last_music();
 
             while (1) {
                 ch = getch();
@@ -397,8 +399,8 @@ void print_dinosaur() {
     }
 
     //erase the previous dinosaur
-    for (int i = 0; i < dinosaur_higth; i++) {
-        for (int j = 0; j < dinosaur_width + DINOSAUR_X_POS; j++) {
+    for (int i = 0; i < DINOSAUR_HEIGHT; i++) {
+        for (int j = 0; j < DINOSAUR_WIDTH + DINOSAUR_X_POS; j++) {
             printf("%c", ' ');
         }
         printf("\n");
@@ -424,11 +426,11 @@ void print_dinosaur() {
 
     //print the dinosaur
 
-    for (int i = 0; i < dinosaur_higth; i++) {
+    for (int i = 0; i < DINOSAUR_HEIGHT; i++) {
         for (int i = 0; i < DINOSAUR_X_POS; i++) {
             printf(" ");
         }
-        for (int j = 0; j < dinosaur_width; j++) {
+        for (int j = 0; j < DINOSAUR_WIDTH; j++) {
             printf("%c", dinosaur[i][j]);
         }
         printf("\n");
