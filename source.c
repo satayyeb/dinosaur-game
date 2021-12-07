@@ -12,6 +12,9 @@
 #define JUMP_HEIGHT 7
 #define JUMP_STEP 3
 #define SKY_X (earth_len / 2)
+#define CACTUS_RESERVED 5
+#define CACTUS_MIN_DIST 70
+#define CACTUS_MAX_DIST 140
 // #define EARTH_LEN 160           //the length of the earth
 
 //specific characters:
@@ -52,7 +55,7 @@ clock_t t2 = 0;
 clock_t last = 0;
 clock_t cactus_timer = 0;
 
-int cactus_arr[50], cactus_cnt = 0;
+int cactus_arr[CACTUS_RESERVED], cactus_cnt = 0;
 int dino_y = 0;
 
 enum DINOSAUR_STATUS {
@@ -134,11 +137,14 @@ void print_cloud(int x, int y);
 void print_sun(int x, int y);
 void print_moon(int x, int y);
 void initialize_console();
+void push_cactus();
+void pop_cactus();
 
 //the main function
 int main() {
 
     initialize_console();
+    srand(time(0));
 
     earth_len = csbi.dwSize.X - 5;
 
@@ -184,7 +190,7 @@ int main() {
     print_cloud(SKY_X + 30, 1);
     print_cloud(SKY_X + 20, 7);
 
-    cactus_timer = 0;
+    for (int i = 0; i < CACTUS_RESERVED; ++i) push_cactus();
 
     while (1) {
 
@@ -203,11 +209,6 @@ int main() {
             }
 
             cactus_rail();
-        }
-
-        if (cactus_timer == 0 || difftime(clock(), cactus_timer) > duration * 100) {
-            cactus_timer = clock();
-            cactus_arr[cactus_cnt++] = earth_len;
         }
 
         int collision = FALSE;
@@ -312,19 +313,27 @@ void faster_the_speed() {
     }
 }
 
+void push_cactus() {
+    int gap = CACTUS_MIN_DIST + rand() % (CACTUS_MAX_DIST - CACTUS_MIN_DIST);
+    cactus_arr[cactus_cnt++] = cactus_cnt == 0 ? earth_len : cactus_arr[cactus_cnt - 1] + gap;
+}
+
+void pop_cactus() {
+    for (int ci = 0; ci < cactus_cnt - 1; ++ci) {
+        cactus_arr[ci] = cactus_arr[ci + 1];
+    }
+    cactus_cnt--;
+}
+
 void cactus_rail() {
 
     for (int ci = 0; ci < cactus_cnt; ++ci) {
-        clear_cactus(cactus_arr[ci], EARTH_Y - 5);
+        if (cactus_arr[ci] < earth_len) clear_cactus(cactus_arr[ci], EARTH_Y - 5);
         cactus_arr[ci] -= speed;
         if (cactus_arr[ci] <= 0) {
-            for (int ci = 0; ci < cactus_cnt - 1; ++ci) {
-                cactus_arr[ci] = cactus_arr[ci + 1];
-            }
-            cactus_cnt--;
-            return;
-        }
-        print_cactus(cactus_arr[ci], EARTH_Y - 5);
+            pop_cactus();
+            push_cactus();
+        } else if (cactus_arr[ci] < earth_len) print_cactus(cactus_arr[ci], EARTH_Y - 5);
     }
 }
 
@@ -355,7 +364,7 @@ void print_cactus(int x, int y) {
     SetColor(Green);
     for (int i = 0; i < CACTUS_HEIGHT; i++) {
         gotoxy(x, y + i);
-        for (int j = 0; j < CACTUS_WIDTH; j++) {
+        for (int j = 0; j < CACTUS_WIDTH && x + j < earth_len; j++) {
             putchar(cactus[i][j]);
         }
     }
