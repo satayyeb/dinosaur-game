@@ -45,7 +45,7 @@
 //global varialbes:
 char ch;
 int earth_len; // will be assigned at start;
-long long score = 0;
+long long score;
 int speed = 1;
 int last_cactus_pos; // set to window width;
 int game_over_flag = 0;
@@ -58,9 +58,6 @@ clock_t cactus_timer = 0;
 int cactus_arr[CACTUS_RESERVED], cactus_cnt = 0;
 int dino_y = 0;
 
-enum DINOSAUR_STATUS {
-    RUNNING, JUMPING, IN_AIR, LANDING
-} dino_status = RUNNING;
 
 #define CLOUD_HEIGHT 3
 #define CLOUD_WIDTH 17
@@ -77,6 +74,14 @@ enum COLOR {
     Black, Blue, Green, Aqua, Red, Purple, Yellow, White,
     Gray, LightBlue, LightGreen, LightAqua, LightRed, LightPurple, LightYellow, BrightWhite
 };
+
+enum DINOSAUR_STATUS {
+    RUNNING, JUMPING, IN_AIR, LANDING
+} dino_status = RUNNING;
+
+enum GAME_STAT {
+    WELCOME_STAT, RUNNING_STAT, LOSE_STAT, BYE_STAT, EXIT_PROGRAM_STAT
+} game_status = WELCOME_STAT;
 
 char cloud[CLOUD_HEIGHT][CLOUD_WIDTH + 1] = {
     {' ',220,223,223,223,223,223,223,223,223,223,223,223,223,223,220,' ', '\0'},
@@ -140,15 +145,43 @@ void initialize_console();
 void push_cactus();
 void pop_cactus();
 
+enum GAME_STAT run_welcome_state();
+enum GAME_STAT run_running_state();
+enum GAME_STAT run_lose_state();
+enum GAME_STAT run_bye_state();
+
 //the main function
 int main() {
 
     initialize_console();
     srand(time(0));
-
     earth_len = csbi.dwSize.X - 5;
 
-    //first screen
+    while (1) {
+        switch (game_status) {
+            case WELCOME_STAT:
+            game_status = run_welcome_state();
+            break;
+            case RUNNING_STAT:
+            game_status = run_running_state();
+            break;
+            case LOSE_STAT:
+            game_status = run_lose_state();
+            break;
+            case BYE_STAT:
+            game_status = run_bye_state();
+            break;
+            case EXIT_PROGRAM_STAT:
+            return 0;
+            break;
+        }
+    }
+}
+
+// ---------------------- function definitions --------------------------------
+
+
+enum GAME_STAT run_welcome_state() {
     system("cls");
     print_dinosaur(DINOSAUR_X, EARTH_Y - 7);
 
@@ -166,9 +199,15 @@ int main() {
         ch = getch();
     } while (ch != ' ' && ch != 'x' && ch != 'X');
 
-    if (ch == 'x' || ch == 'X') {
-        return 0;
+    if (ch == ' ') {
+        return RUNNING_STAT;
+    } else {
+        return BYE_STAT;
     }
+}
+
+enum GAME_STAT run_running_state() {
+    score = 0;
     system("cls");
 
     //init the game
@@ -183,13 +222,14 @@ int main() {
 
     gotoxy(3, 1);
     SetColor(BrightWhite);
-    printf("score: ");
+    printf("Score: ");
 
     //printing cloud 1&2&3
     print_cloud(SKY_X, 5);
     print_cloud(SKY_X + 30, 1);
     print_cloud(SKY_X + 20, 7);
 
+    cactus_cnt = 0;
     for (int i = 0; i < CACTUS_RESERVED; ++i) push_cactus();
 
     while (1) {
@@ -221,27 +261,7 @@ int main() {
         }
 
         if (collision) {
-            system("cls");
-            gotoxy(5, 5);
-            SetColor(Blue);
-            printf("U lost :(");
-            gotoxy(5, 6);
-            printf("Your Score: %lld", score);
-            gotoxy(5, 7);
-            printf("Press x to exit...");
-            // gotoxy(5, 8);
-            // printf("Press space to play");
-
-            //last_music();
-
-            while (1) {
-                ch = getch();
-                if (ch == 'x' || ch == 'X') {
-                    return 0;
-                } else if (ch == ' ') {
-
-                }
-            }
+            return LOSE_STAT;
         }
 
         if ((score / 500) % 2 == 0) {
@@ -284,16 +304,42 @@ int main() {
             } else if (GetKeyState(VK_SHIFT) & GetKeyState(0x48) & 0x8000) { //if shift+H pressed
                 score += 100;
             } else if (GetKeyState(0x58) & 0x8000) {   //if x or X pressed
-                SetColor(LightYellow);
-                system("cls");
-                printf("\n\n        It worked! I have no idea why...  :P    \n\n\n\n");
-                return (0);
+                return BYE_STAT;
             }
         }
     }
 }
 
-// ---------------------- function definitions --------------------------------
+enum GAME_STAT run_lose_state() {
+    system("cls");
+    gotoxy(5, 5);
+    SetColor(Blue);
+    printf("U lost :(");
+    gotoxy(5, 6);
+    printf("Your Score: %lld", score);
+    gotoxy(5, 7);
+    printf("Press x to end the game...");
+    gotoxy(5, 8);
+    printf("Press space to play again...");
+
+    //last_music();
+
+    while (1) {
+        ch = getch();
+        if (ch == 'x' || ch == 'X') {
+            return BYE_STAT;
+        } else if (ch == ' ') {
+            return RUNNING_STAT;
+        }
+    }
+}
+
+enum GAME_STAT run_bye_state() {
+    system("cls");
+    SetColor(LightYellow);
+    printf("\n\n        It worked! I have no idea why...  :P    \n\n\n\n");
+    return EXIT_PROGRAM_STAT;
+}
 
 void faster_the_speed() {
     if (1 <= score && score < 150) {
