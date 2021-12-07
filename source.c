@@ -9,7 +9,8 @@
 #define duration  30           //The length of time that cactus moves
 #define DINOSAUR_X 7           //the X-position of dinosaur
 #define EARTH_Y 30             //the Y-position of the earth
-#define JUMP_HEIGHT 8
+#define JUMP_HEIGHT 7
+#define JUMP_STEP 3
 #define SKY_X (earth_len / 2)
 // #define EARTH_LEN 160           //the length of the earth
 
@@ -251,7 +252,7 @@ int main() {
         if (dino_status == JUMPING && difftime(clock(), t) > duration * 2/3) {
             t = clock();
             erase_dinosaur(DINOSAUR_X, EARTH_Y - DINOSAUR_HEIGHT - dino_y);
-            dino_y++;
+            dino_y = min(dino_y + JUMP_STEP, JUMP_HEIGHT);
             print_dinosaur(DINOSAUR_X, EARTH_Y - DINOSAUR_HEIGHT - dino_y);
             if (dino_y == JUMP_HEIGHT) {
                 dino_status = IN_AIR;
@@ -264,7 +265,7 @@ int main() {
         if (dino_status == LANDING && difftime(clock(), t) > duration * 2/3) {
             t = clock();
             erase_dinosaur(DINOSAUR_X, EARTH_Y - DINOSAUR_HEIGHT - dino_y);
-            dino_y--;
+            dino_y = max(dino_y - JUMP_STEP, 0);
             print_dinosaur(DINOSAUR_X, EARTH_Y - DINOSAUR_HEIGHT - dino_y);
             if (dino_y == 0) {
                 dino_status = RUNNING;
@@ -281,7 +282,7 @@ int main() {
                 if (score < 0) score = 0;
             } else if (GetKeyState(VK_SHIFT) & GetKeyState(0x48) & 0x8000) { //if shift+H pressed
                 score += 100;
-            } else if (GetKeyState(0x58) & 0x8000) {   //if X pressed
+            } else if (GetKeyState(0x58) & 0x8000) {   //if x or X pressed
                 SetColor(LightYellow);
                 system("cls");
                 printf("\n\n        It worked! I have no idea why...  :P    \n\n\n\n");
