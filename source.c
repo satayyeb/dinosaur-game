@@ -365,7 +365,9 @@ void faster_the_speed() {
 }
 
 void push_cactus() {
-    int gap = 100;
+    int mn = CACTUS_MIN_DIST + speed * 6;
+    int mx = CACTUS_MAX_DIST + speed * 6;
+    int gap = mn + rand() % (mx - mn);
     cactus_arr[cactus_cnt++] = cactus_cnt == 0 ? earth_len : cactus_arr[cactus_cnt - 1] + gap;
 }
 
