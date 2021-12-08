@@ -95,7 +95,7 @@ char moon[MOON_HEIGHT][MOON_WIDTH + 1] = {
     {223,220,220,219,219,223,' ', '\0'},
 };
 
-char sun[SUN_HEIGHT][SUN_WIDTH + 1] = { 
+char sun[SUN_HEIGHT][SUN_WIDTH + 1] = {
     {' ','\\',' '  ,'|',' '  ,'/',' ', '\0'},
     {196,' ',220,220,220,' ',196, '\0'},
     {196,' ',219,219,219,' ',196, '\0'},
@@ -159,19 +159,19 @@ int main() {
 
     while (1) {
         switch (game_status) {
-            case WELCOME_STAT:
+        case WELCOME_STAT:
             game_status = run_welcome_state();
             break;
-            case RUNNING_STAT:
+        case RUNNING_STAT:
             game_status = run_running_state();
             break;
-            case LOSE_STAT:
+        case LOSE_STAT:
             game_status = run_lose_state();
             break;
-            case BYE_STAT:
+        case BYE_STAT:
             game_status = run_bye_state();
             break;
-            case EXIT_PROGRAM_STAT:
+        case EXIT_PROGRAM_STAT:
             return 0;
             break;
         }
@@ -254,8 +254,8 @@ enum GAME_STAT run_running_state() {
         int collision = FALSE;
         for (int ci = 0; ci < cactus_cnt; ++ci) {
             int cpos = cactus_arr[ci];
-            if (((dino_status == RUNNING) && (cpos + 7) > DINOSAUR_X && cpos < DINOSAUR_X + 15) || 
-            ((dino_status == JUMPING) && (cpos + 10) > DINOSAUR_X && cpos < DINOSAUR_X + 10)) {
+            if (((dino_status == RUNNING) && (cpos + 7) > DINOSAUR_X && cpos < DINOSAUR_X + 15) ||
+                ((dino_status != RUNNING) && (dino_status != IN_AIR) &&(cpos + 10) > DINOSAUR_X && cpos < DINOSAUR_X + 14)) {
                 collision = TRUE;
             }
         }
@@ -270,7 +270,7 @@ enum GAME_STAT run_running_state() {
             print_moon(SKY_X + 18, 1);
         }
 
-        if (dino_status == JUMPING && difftime(clock(), t) > duration * 2/3) {
+        if (dino_status == JUMPING && difftime(clock(), t) > duration * 2 / 3) {
             t = clock();
             erase_dinosaur(DINOSAUR_X, EARTH_Y - DINOSAUR_HEIGHT - dino_y);
             dino_y = min(dino_y + JUMP_STEP, JUMP_HEIGHT);
@@ -279,11 +279,11 @@ enum GAME_STAT run_running_state() {
                 dino_status = IN_AIR;
             }
         }
-        if (dino_status == IN_AIR && difftime(clock(), t) > duration * 20) {
+        if (dino_status == IN_AIR && difftime(clock(), t) > (duration * 35 / speed) + 12) {
             t = clock();
             dino_status = LANDING;
         }
-        if (dino_status == LANDING && difftime(clock(), t) > duration * 2/3) {
+        if (dino_status == LANDING && difftime(clock(), t) > duration * 2 / 3) {
             t = clock();
             erase_dinosaur(DINOSAUR_X, EARTH_Y - DINOSAUR_HEIGHT - dino_y);
             dino_y = max(dino_y - JUMP_STEP, 0);
@@ -320,7 +320,7 @@ enum GAME_STAT run_lose_state() {
     gotoxy(5, 7);
     printf("Press x to end the game...");
     gotoxy(5, 8);
-    printf("Press space to play again...");
+    printf("Press r to play again...");
 
     //last_music();
 
@@ -328,7 +328,7 @@ enum GAME_STAT run_lose_state() {
         ch = getch();
         if (ch == 'x' || ch == 'X') {
             return BYE_STAT;
-        } else if (ch == ' ') {
+        } else if (ch == 'r') {
             return RUNNING_STAT;
         }
     }
@@ -342,10 +342,10 @@ enum GAME_STAT run_bye_state() {
 }
 
 void faster_the_speed() {
-    if (1 <= score && score < 150) {
+    if (1 <= score && score < 250) {
         speed = 1;
     }
-    if (150 <= score && score < 500) {
+    if (250 <= score && score < 500) {
         speed = 2;
     }
     if (500 <= score && score < 1100) {
@@ -360,7 +360,7 @@ void faster_the_speed() {
 }
 
 void push_cactus() {
-    int gap = CACTUS_MIN_DIST + rand() % (CACTUS_MAX_DIST - CACTUS_MIN_DIST);
+    int gap = CACTUS_MIN_DIST + rand() % (CACTUS_MAX_DIST - CACTUS_MIN_DIST + 1);
     cactus_arr[cactus_cnt++] = cactus_cnt == 0 ? earth_len : cactus_arr[cactus_cnt - 1] + gap;
 }
 
