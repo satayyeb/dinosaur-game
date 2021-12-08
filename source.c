@@ -283,8 +283,17 @@
                 printf("%lld", score);
                 if (level_timer > 0) {
                     printf(" Next Level");
+                    gotoxy(DINOSAUR_X * 4, EARTH_Y - DINOSAUR_HEIGHT - 3);
+                    printf("                   ");
                 } else {
                     printf("           ");
+                }
+
+                if (speed != next_speed && level_timer == 0) {
+                    gotoxy(DINOSAUR_X * 4, EARTH_Y - DINOSAUR_HEIGHT - 3);
+                    printf(" near next level...");
+                } else {
+                    printf("                   ");
                 }
 
                 cactus_rail();
@@ -408,6 +417,8 @@
         }
         if (speed == next_speed) {
             while (cactus_cnt < CACTUS_RESERVED) push_cactus();
+        } else {
+            while (cactus_cnt > 0 && cactus_arr[cactus_cnt - 1] > earth_len) --cactus_cnt;
         }
     }
 
