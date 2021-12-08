@@ -220,6 +220,7 @@ enum GAME_STAT run_running_state() {
         putchar(EARTH_MATERILAL);
     }
 
+
     gotoxy(3, 1);
     SetColor(BrightWhite);
     printf("Score: ");
@@ -360,7 +361,7 @@ void faster_the_speed() {
 }
 
 void push_cactus() {
-    int gap = CACTUS_MIN_DIST + rand() % (CACTUS_MAX_DIST - CACTUS_MIN_DIST + 1);
+    int gap = 100;
     cactus_arr[cactus_cnt++] = cactus_cnt == 0 ? earth_len : cactus_arr[cactus_cnt - 1] + gap;
 }
 
