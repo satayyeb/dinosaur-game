@@ -381,8 +381,7 @@ void print_moon(int x, int y) {
     SetColor(BrightWhite);
 }
 
-void print_dinosaur() {
-
+void print_dinosaur() { 
     SetColor(Red);
 
     //go to the last position
