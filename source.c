@@ -386,7 +386,8 @@
         int mn = CACTUS_MIN_DIST + speed * 6;
         int mx = CACTUS_MAX_DIST + speed * 6;
         int gap = mn + rand() % (mx - mn);
-        cactus_arr[cactus_cnt++] = cactus_cnt == 0 ? earth_len : cactus_arr[cactus_cnt - 1] + gap;
+        cactus_arr[cactus_cnt] = cactus_cnt == 0 ? earth_len : cactus_arr[cactus_cnt - 1] + gap;
+        cactus_cnt++;
     }
 
     void pop_cactus() {
@@ -403,7 +404,6 @@
             cactus_arr[ci] -= speed;
             if (cactus_arr[ci] <= 0) {
                 pop_cactus();
-                
             } else if (cactus_arr[ci] < earth_len) print_cactus(cactus_arr[ci], EARTH_Y - 5);
         }
         if (speed == next_speed) {
