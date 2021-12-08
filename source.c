@@ -237,6 +237,27 @@
 
         while (1) {
 
+            int collision = FALSE;
+            for (int ci = 0; ci < cactus_cnt; ++ci) {
+                int cpos = cactus_arr[ci];
+                if ((dino_status == RUNNING) && cpos >= DINOSAUR_X && cpos <= DINOSAUR_X + DINOSAUR_WIDTH &&
+                    (dinosaur[3][cpos - DINOSAUR_X - 1] != ' ')){
+                    collision = TRUE;
+                }
+                if ((dino_status != RUNNING) && (dino_status != IN_AIR) && cpos >= DINOSAUR_X && cpos <= DINOSAUR_X + DINOSAUR_WIDTH &&
+                    dino_y <  CACTUS_HEIGHT && (dinosaur[DINOSAUR_HEIGHT + dino_y - CACTUS_HEIGHT][cpos - DINOSAUR_X - 1] != ' ')) {
+                    collision = TRUE;
+                }
+                if ((dino_status != RUNNING) && (dino_status != IN_AIR) && cpos + CACTUS_WIDTH >= DINOSAUR_X && cpos  + CACTUS_WIDTH <= DINOSAUR_X + DINOSAUR_WIDTH &&
+                    dino_y <  CACTUS_HEIGHT && (dinosaur[DINOSAUR_HEIGHT + dino_y - CACTUS_HEIGHT][cpos + CACTUS_WIDTH - DINOSAUR_X - 1] != ' ')) {
+                    collision = TRUE;
+                }
+            }
+
+            if (collision) {
+                return LOSE_STAT;
+            }
+
             // if (cactus_arr[0] > DINOSAUR_X + 50 || (cactus_arr[0] < 2 && cactus_arr[1] > DINOSAUR_X + 50)) {
             // }
 
@@ -267,27 +288,6 @@
                 }
 
                 cactus_rail();
-            }
-
-            int collision = FALSE;
-            for (int ci = 0; ci < cactus_cnt; ++ci) {
-                int cpos = cactus_arr[ci];
-                if ((dino_status == RUNNING) && cpos >= DINOSAUR_X && cpos <= DINOSAUR_X + DINOSAUR_WIDTH &&
-                    (dinosaur[3][cpos - DINOSAUR_X - 1] != ' ')){
-                    collision = TRUE;
-                }
-                if ((dino_status != RUNNING) && (dino_status != IN_AIR) && cpos >= DINOSAUR_X && cpos <= DINOSAUR_X + DINOSAUR_WIDTH &&
-                    dino_y <  CACTUS_HEIGHT && (dinosaur[DINOSAUR_HEIGHT + dino_y - CACTUS_HEIGHT][cpos - DINOSAUR_X - 1] != ' ')) {
-                    collision = TRUE;
-                }
-                if ((dino_status != RUNNING) && (dino_status != IN_AIR) && cpos + CACTUS_WIDTH >= DINOSAUR_X && cpos  + CACTUS_WIDTH <= DINOSAUR_X + DINOSAUR_WIDTH &&
-                    dino_y <  CACTUS_HEIGHT && (dinosaur[DINOSAUR_HEIGHT + dino_y - CACTUS_HEIGHT][cpos + CACTUS_WIDTH - DINOSAUR_X - 1] != ' ')) {
-                    collision = TRUE;
-                }
-            } 
-
-            if (collision) {
-                return LOSE_STAT;
             }
 
             if ((score / 500) % 2 == 0) {
