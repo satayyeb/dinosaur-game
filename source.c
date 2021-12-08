@@ -225,7 +225,7 @@
 
         gotoxy(3, 1);
         SetColor(BrightWhite);
-        printf("Score: %d", score);
+        printf("Score:");
 
         //printing cloud 1&2&3
         print_cloud(SKY_X, 5);
@@ -260,8 +260,10 @@
                 gotoxy(10, 1);
                 SetColor(BrightWhite);
                 printf("%lld", score);
-                for (int i = 0; i < 10; i++) {
-                    putchar(' ');
+                if (level_timer > 0) {
+                    printf(" Next Level");
+                } else {
+                    printf("           ");
                 }
 
                 cactus_rail();
@@ -270,11 +272,19 @@
             int collision = FALSE;
             for (int ci = 0; ci < cactus_cnt; ++ci) {
                 int cpos = cactus_arr[ci];
-                if (((dino_status == RUNNING) && (cpos + 7) > DINOSAUR_X && cpos < DINOSAUR_X + 15) ||
-                    ((dino_status == JUMPING) && cpos < (DINOSAUR_X + 5))) {
+                if ((dino_status == RUNNING) && cpos >= DINOSAUR_X && cpos <= DINOSAUR_X + DINOSAUR_WIDTH &&
+                    (dinosaur[3][cpos - DINOSAUR_X - 1] != ' ')){
                     collision = TRUE;
                 }
-            }
+                if ((dino_status != RUNNING) && (dino_status != IN_AIR) && cpos >= DINOSAUR_X && cpos <= DINOSAUR_X + DINOSAUR_WIDTH &&
+                    dino_y <  CACTUS_HEIGHT && (dinosaur[DINOSAUR_HEIGHT + dino_y - CACTUS_HEIGHT][cpos - DINOSAUR_X - 1] != ' ')) {
+                    collision = TRUE;
+                }
+                if ((dino_status != RUNNING) && (dino_status != IN_AIR) && cpos + CACTUS_WIDTH >= DINOSAUR_X && cpos  + CACTUS_WIDTH <= DINOSAUR_X + DINOSAUR_WIDTH &&
+                    dino_y <  CACTUS_HEIGHT && (dinosaur[DINOSAUR_HEIGHT + dino_y - CACTUS_HEIGHT][cpos + CACTUS_WIDTH - DINOSAUR_X - 1] != ' ')) {
+                    collision = TRUE;
+                }
+            } 
 
             if (collision) {
                 return LOSE_STAT;
@@ -327,6 +337,7 @@
     }
 
     enum GAME_STAT run_lose_state() {
+        sleep(1);
         system("cls");
         gotoxy(5, 5);
         SetColor(Blue);
