@@ -284,8 +284,17 @@ enum GAME_STAT run_running_state() {
             printf("%lld", score);
             if (level_timer > 0) {
                 printf(" Next Level");
+                gotoxy(DINOSAUR_X * 4, EARTH_Y - DINOSAUR_HEIGHT - 3);
+                printf("                   ");
             } else {
                 printf("           ");
+            }
+
+            if (speed != next_speed && level_timer == 0) {
+                gotoxy(DINOSAUR_X * 4, EARTH_Y - DINOSAUR_HEIGHT - 3);
+                printf(" near next level...");
+            } else {
+                printf("                   ");
             }
 
             cactus_rail();
@@ -338,7 +347,7 @@ enum GAME_STAT run_running_state() {
 }
 
 enum GAME_STAT run_lose_state() {
-    sleep(1);
+    Sleep(1);
     system("cls");
     gotoxy(5, 5);
     SetColor(Blue);
@@ -411,6 +420,8 @@ void cactus_rail() {
     }
     if (speed == next_speed) {
         while (cactus_cnt < CACTUS_RESERVED) push_cactus();
+    } else {
+        while (cactus_cnt > 0 && cactus_arr[cactus_cnt - 1] > earth_len) --cactus_cnt;
     }
 }
 
