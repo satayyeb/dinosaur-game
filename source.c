@@ -390,7 +390,7 @@ int get_speed_now() {
     } else if (score < 2500) {
         return 4;
     } else {
-        return 5;
+        return 4 + score / 2000;
     }
 }
 
@@ -622,4 +622,3 @@ int last_music() {
     Beep(E5, half * 1.2);
     if (scan_for_X_or_R()) return 1;
 }
-
